@@ -1,0 +1,17 @@
+# 가상환경
+venv/
+
+# Pytest 캐시
+.pytest_cache/
+
+# Python 바이트코드
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE 설정
+.idea/
+
+# 테스트 출력물
+*.png
+*.html
