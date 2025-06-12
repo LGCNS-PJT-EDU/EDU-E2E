@@ -2,6 +2,9 @@ def test_example(page):
     page.goto("http://localhost:5173")
     assert "TakeIT" in page.title()
 
+    email = "e2etest1@test.com"
+    password = "Test123!"
+
     #회원가입으로 이동
     page.click("text=/signup/i")
     page.wait_for_url("**/signup")
@@ -21,12 +24,12 @@ def test_example(page):
     # page.wait_for_timeout(1000)
 
     # 사용 가능한 이메일 입력
-    page.fill("input[placeholder='이메일']", "e2etest@test.com")
+    page.fill("input[placeholder='이메일']", email)
     page.click("text=중복확인")
 
     # 비밀번호 입력
-    page.fill("input[placeholder='비밀번호']", "Test123!")
-    page.fill("input[placeholder='비밀번호 확인']", "Test123!")
+    page.fill("input[placeholder='비밀번호']", password)
+    page.fill("input[placeholder='비밀번호 확인']", password)
 
     # Join In 버튼 클릭
     page.click("text=Join In")
@@ -36,10 +39,10 @@ def test_example(page):
     assert "/login" in page.url
 
     #이메일 입력
-    page.fill("input#email", "e2etest@test.com")
+    page.fill("input#email", email)
 
     #비밀번호 입력
-    page.fill("input#password", "Test123!")
+    page.fill("input#password", password)
 
     # 로그인 버튼 클릭
     page.click("text=CONTINUE")
