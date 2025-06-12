@@ -2,7 +2,7 @@ def test_example(page):
     page.goto("http://localhost:5173")
     assert "TakeIT" in page.title()
 
-    email = "e2etest1@test.com"
+    email = "e2etest4@test.com"
     password = "Test123!"
 
     #회원가입으로 이동
