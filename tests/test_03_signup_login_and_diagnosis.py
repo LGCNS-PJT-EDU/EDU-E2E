@@ -4,14 +4,49 @@ def test_example(page):
     page.goto("http://localhost:5173")
     assert "TakeIT" in page.title()
 
-    email = "testGuestDiagnosis3@test.com"
+    email = "testUserDiagnosis02@test.com"
     password = "Test123!"
 
-    page.click("text=/roadmap/i")
-    page.wait_for_url("**/roadmap", timeout=5000)
-    assert "/roadmap" in page.url
+    #회원가입으로 이동
+    page.click("text=/signup/i")
+    page.wait_for_url("**/signup")
+    assert "/signup" in page.url
 
-    # 진단 페이지로 이동
+    # 닉네임 입력
+    page.fill("input[placeholder='닉네임']", "E2E test")
+
+    # 사용 가능한 이메일 입력
+    page.fill("input[placeholder='이메일']", email)
+    page.click("text=중복확인")
+
+    # 비밀번호 입력
+    page.fill("input[placeholder='비밀번호']", password)
+    page.fill("input[placeholder='비밀번호 확인']", password)
+
+    # Join In 버튼 클릭
+    page.click("text=Join In")
+
+    # 회원가입 완료 후 로그인 페이지 이동 확인
+    page.wait_for_url("**/login", timeout=5000)
+    assert "/login" in page.url
+
+    #이메일 입력
+    page.fill("input#email", email)
+
+    #비밀번호 입력
+    page.fill("input#password", password)
+
+    # 로그인 버튼 클릭
+    page.click("text=CONTINUE")
+
+    try:
+        page.wait_for_url("**/roadmap", timeout=5000)
+        assert "/roadmap" in page.url
+    except:
+        page.screenshot(path="login_error.png")
+        raise AssertionError("로그인 후 /roadmap으로 이동하지 않음")
+
+    #진단 페이지로 이동
     page.wait_for_selector("text=로드맵이 없습니다", timeout=3000)
     page.click("text=진단하러 가기")
 
@@ -48,7 +83,7 @@ def test_example(page):
                     choices.append((btn, text))
 
             if not choices:
-                raise AssertionError(f"{i + 1}번째 질문에서 유효한 선택지를 찾을 수 없습니다.")
+                raise AssertionError(f"{i+1}번째 질문에서 유효한 선택지를 찾을 수 없습니다.")
 
             # 랜덤 선택
             selected, selected_text = random.choice(choices)
@@ -67,14 +102,16 @@ def test_example(page):
                 page.click("text=다음 문제로")
 
         except Exception as e:
-            page.screenshot(path=f"diagnosis_error_step_{i + 1}.png")
+            page.screenshot(path=f"diagnosis_error_step_{i+1}.png")
             raise e
+
+    page.wait_for_url(2000)
 
     # 결과 페이지 도달 확인
     page.reload()
     page.wait_for_url("**/roadmap", timeout=50000)
-    # assert "/roadmap" in page.url
-    # page.reload()
+    #assert "/roadmap" in page.url
+    #page.reload()
     # 로드맵 로딩이 완료될 때까지 대기
     try:
         page.wait_for_selector("text=오늘도 학습을 시작해볼까요", timeout=5000)
@@ -85,41 +122,4 @@ def test_example(page):
         page.screenshot(path="roadmap_render_fail.png")
         raise AssertionError("❌ 로드맵 페이지에서 정상 렌더링이 되지 않았습니다.")
 
-        # 회원가입으로 이동
-        page.click("text=/signup/i")
-        page.wait_for_url("**/signup")
-        assert "/signup" in page.url
-
-        # 닉네임 입력
-        page.fill("input[placeholder='닉네임']", "E2E test")
-
-        # 사용 가능한 이메일 입력
-        page.fill("input[placeholder='이메일']", email)
-        page.click("text=중복확인")
-
-        # 비밀번호 입력
-        page.fill("input[placeholder='비밀번호']", password)
-        page.fill("input[placeholder='비밀번호 확인']", password)
-
-        # Join In 버튼 클릭
-        page.click("text=Join In")
-
-        # 회원가입 완료 후 로그인 페이지 이동 확인
-        page.wait_for_url("**/login", timeout=5000)
-        assert "/login" in page.url
-
-        # 이메일 입력
-        page.fill("input#email", email)
-
-        # 비밀번호 입력
-        page.fill("input#password", password)
-
-        # 로그인 버튼 클릭
-        page.click("text=CONTINUE")
-
-        try:
-            page.wait_for_url("**/roadmap", timeout=5000)
-            assert "/roadmap" in page.url
-        except:
-            page.screenshot(path="login_error.png")
-            raise AssertionError("로그인 후 /roadmap으로 이동하지 않음")
+    page.screenshot(path="user_diagnosis.png")

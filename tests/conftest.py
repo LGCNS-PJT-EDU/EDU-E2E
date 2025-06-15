@@ -15,6 +15,7 @@ def browser(playwright_instance):
 @pytest.fixture
 def page(browser, request):
     context = browser.new_context(
+        viewport={"width": 1920, "height": 1080},
         record_video_dir="videos/",  # 저장 폴더 경로
         record_video_size={"width": 1280, "height": 720}  # 선택: 해상도
     )
