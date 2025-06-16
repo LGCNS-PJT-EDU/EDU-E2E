@@ -8,14 +8,14 @@ def playwright_instance():
 
 @pytest.fixture(scope="session")
 def browser(playwright_instance):
-    browser = playwright_instance.chromium.launch(headless=False, slow_mo=500)
+    browser = playwright_instance.chromium.launch(headless=False, slow_mo=0)
     yield browser
     browser.close()
 
 @pytest.fixture
 def page(browser, request):
     context = browser.new_context(
-        viewport={"width": 1920, "height": 1080},
+        viewport={"width": 1440, "height": 900},
         record_video_dir="videos/",  # 저장 폴더 경로
         record_video_size={"width": 1280, "height": 720}  # 선택: 해상도
     )

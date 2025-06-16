@@ -1,16 +1,21 @@
 import random
 
-def test_example(page):
+def test_05_total_user_flow(page):
     page.goto("http://localhost:5173")
     assert "TakeIT" in page.title()
 
     email = "e2eTotalTest01@test.com"
     password = "Test123!"
 
-    #회원가입으로 이동
+    # 회원가입으로 이동
     page.click("text=/signup/i")
     page.wait_for_url("**/signup")
     assert "/signup" in page.url
+
+    # 개인정보 동의 모달 확인 및 동의 처리
+    page.wait_for_selector("text=개인정보", timeout=3000)
+    page.click("text=모두 동의")  # 모달 내 동의 버튼 (정확한 텍스트 필요 시 조정)
+    page.click("text=동의하고 계속")
 
     # 닉네임 입력
     page.fill("input[placeholder='닉네임']", "E2E test")
@@ -18,35 +23,31 @@ def test_example(page):
     # 사용 가능한 이메일 입력
     page.fill("input[placeholder='이메일']", email)
     page.click("text=중복확인")
+    page.wait_for_selector("text=사용 가능한 이메일입니다.")
 
     # 비밀번호 입력
     page.fill("input[placeholder='비밀번호']", password)
     page.fill("input[placeholder='비밀번호 확인']", password)
 
-    # Join In 버튼 클릭
-    page.click("text=Join In")
+    # ✅ 회원가입 버튼: 정확히 하나 선택
+    btn = page.get_by_role("button", name="회원가입")
+    btn.wait_for(state="visible")
+    assert btn.is_enabled()
+    btn.click()
 
     # 회원가입 완료 후 로그인 페이지 이동 확인
     page.wait_for_url("**/login", timeout=5000)
     assert "/login" in page.url
 
-    #이메일 입력
+    # 로그인
     page.fill("input#email", email)
-
-    #비밀번호 입력
     page.fill("input#password", password)
-
-    # 로그인 버튼 클릭
     page.click("text=CONTINUE")
 
-    try:
-        page.wait_for_url("**/roadmap", timeout=5000)
-        assert "/roadmap" in page.url
-    except:
-        page.screenshot(path="login_error.png")
-        raise AssertionError("로그인 후 /roadmap으로 이동하지 않음")
+    page.wait_for_url("**/roadmap", timeout=5000)
+    assert "/roadmap" in page.url
 
-    #진단 페이지로 이동
+    # 진단 페이지로 이동
     page.wait_for_selector("text=로드맵이 없습니다", timeout=3000)
     page.click("text=진단하러 가기")
 
@@ -83,7 +84,7 @@ def test_example(page):
                     choices.append((btn, text))
 
             if not choices:
-                raise AssertionError(f"{i+1}번째 질문에서 유효한 선택지를 찾을 수 없습니다.")
+                raise AssertionError(f"{i + 1}번째 질문에서 유효한 선택지를 찾을 수 없습니다.")
 
             # 랜덤 선택
             selected, selected_text = random.choice(choices)
@@ -102,14 +103,16 @@ def test_example(page):
                 page.click("text=다음 문제로")
 
         except Exception as e:
-            page.screenshot(path=f"diagnosis_error_step_{i+1}.png")
+            page.screenshot(path=f"diagnosis_error_step_{i + 1}.png")
             raise e
+
+    page.wait_for_timeout(2000)
 
     # 결과 페이지 도달 확인
     page.reload()
     page.wait_for_url("**/roadmap", timeout=50000)
-    #assert "/roadmap" in page.url
-    #page.reload()
+    # assert "/roadmap" in page.url
+    page.reload()
     # 로드맵 로딩이 완료될 때까지 대기
     try:
         page.wait_for_selector("text=오늘도 학습을 시작해볼까요", timeout=5000)
@@ -127,7 +130,6 @@ def test_example(page):
     except:
         page.screenshot(path="login_error.png")
         raise AssertionError("로그인 후 /roadmap으로 이동하지 않음")
-
 
     # 첫 번째 과목 노드 이미지 클릭
     try:
@@ -149,6 +151,7 @@ def test_example(page):
         page.screenshot(path="subject_click_error.png")
         raise AssertionError("❌ 첫 번째 과목 클릭 중 오류 발생") from e
 
+    page.wait_for_timeout(1500)
     page.click("text=사전평가 보러가기")
 
     # 이동 확인
@@ -194,18 +197,18 @@ def test_example(page):
             create_btn = page.query_selector("text=로드맵 생성")
 
             if i >= 9:
-                if submit_btn and submit_btn.is_enabled():
-                    submit_btn.click()
-                elif create_btn and create_btn.is_enabled():
-                    create_btn.click()
-                break
+                page.wait_for_timeout(1000)  # 상태 반영 여유
+
+                page.click("text=제출")
+                page.click("text=제출")
             else:
-                page.wait_for_selector("text=다음 문제로", timeout=3000)
                 page.click("text=다음 문제로")
 
         except Exception as e:
-            page.screenshot(path=f"diagnosis_error_step_{i + 1}.png")
+            page.screenshot(path=f"post_test_error_step_{i + 1}.png")
             raise e
+
+    page.wait_for_timeout(2000)
 
     # "오답노트 보러 가기" 모달 버튼 클릭
     try:
@@ -223,6 +226,8 @@ def test_example(page):
     page.wait_for_timeout(1000)
     btns = page.query_selector_all("text=해설 보기")
     btns[0].click()
+    page.wait_for_timeout(1000)
+    btns[1].click()
     page.wait_for_timeout(2000)
 
     # 페이지를 천천히 스크롤
@@ -360,13 +365,11 @@ def test_example(page):
             create_btn = page.query_selector("text=로드맵 생성")
 
             if i >= 14:
-                if submit_btn and submit_btn.is_enabled():
-                    submit_btn.click()
-                elif create_btn and create_btn.is_enabled():
-                    create_btn.click()
-                break
+                page.wait_for_timeout(1000)  # 상태 반영 여유
+
+                page.click("text=제출")
+                page.click("text=제출")
             else:
-                page.wait_for_selector("text=다음 문제로", timeout=3000)
                 page.click("text=다음 문제로")
 
         except Exception as e:
@@ -434,23 +437,20 @@ def test_example(page):
     page.wait_for_url("**/report**", timeout=5000)
     assert "/report" in page.url
 
-    for i in range(2):
-        page.locator("button").nth(6 + i).click()
-        page.wait_for_timeout(1000)
+    buttons = page.query_selector_all("button")
+    print("🔍 페이지 내 버튼 목록:")
+    for i, btn in enumerate(buttons, start=1):
+        try:
+            text = btn.inner_text().strip()
+            print(f"{i:02d}. '{text}'")
+        except Exception as e:
+            print(f"{i:02d}. (텍스트 읽기 실패): {e}")
 
-    # page.locator("button").nth(6).click()
-    # page.wait_for_timeout(1000)
-    # page.locator("button").nth(3).click()
-    # page.wait_for_timeout(1000)
-    #
-    # buttons = page.query_selector_all("button")
-    # print("🔍 페이지 내 버튼 목록:")
-    # for i, btn in enumerate(buttons, start=1):
-    #     try:
-    #         text = btn.inner_text().strip()
-    #         print(f"{i:02d}. '{text}'")
-    #     except Exception as e:
-    #         print(f"{i:02d}. (텍스트 읽기 실패): {e}")
+    page.wait_for_timeout(1500)
+    page.get_by_role("button", name="사후 평가").click(force=True)
+    page.wait_for_timeout(1500)
+    page.click("text=사전/사후평가 비교")
+    page.wait_for_timeout(1500)
 
     # MyPage 버튼 클릭
     page.click("text=MyPage")
@@ -464,5 +464,6 @@ def test_example(page):
     page.click("text=추천 콘텐츠")
     page.wait_for_timeout(2000)
 
-    page.screenshot(path="total_test.png")
+    page.screenshot(path="test_05_success.png")
+
 

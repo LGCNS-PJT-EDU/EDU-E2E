@@ -1,6 +1,6 @@
 import random
 
-def test_example(page):
+def test_04_after_roadmap(page):
     page.goto("http://localhost:5173")
     assert "TakeIT" in page.title()
 
@@ -22,10 +22,10 @@ def test_example(page):
         page.wait_for_url("**/roadmap", timeout=5000)
         assert "/roadmap" in page.url
     except:
-        page.screenshot(path="login_error.png")
+        page.screenshot(path="test_04_login_error.png")
         raise AssertionError("로그인 후 /roadmap으로 이동하지 않음")
 
-    page.wait_for_timeout(2000)
+    page.wait_for_timeout(1000)
 
     # 첫 번째 과목 노드 이미지 클릭
     try:
@@ -47,6 +47,7 @@ def test_example(page):
         page.screenshot(path="subject_click_error.png")
         raise AssertionError("❌ 첫 번째 과목 클릭 중 오류 발생") from e
 
+    page.wait_for_timeout(1500)
     page.click("text=사전평가 보러가기")
 
     # 이동 확인
@@ -92,18 +93,18 @@ def test_example(page):
             create_btn = page.query_selector("text=로드맵 생성")
 
             if i >= 9:
-                if submit_btn and submit_btn.is_enabled():
-                    submit_btn.click()
-                elif create_btn and create_btn.is_enabled():
-                    create_btn.click()
-                break
+                page.wait_for_timeout(1000)  # 상태 반영 여유
+
+                page.click("text=제출")
+                page.click("text=제출")
             else:
-                page.wait_for_selector("text=다음 문제로", timeout=3000)
                 page.click("text=다음 문제로")
 
         except Exception as e:
-            page.screenshot(path=f"diagnosis_error_step_{i + 1}.png")
+            page.screenshot(path=f"post_test_error_step_{i + 1}.png")
             raise e
+
+    page.wait_for_timeout(2000)
 
     # "오답노트 보러 가기" 모달 버튼 클릭
     try:
@@ -121,6 +122,8 @@ def test_example(page):
     page.wait_for_timeout(1000)
     btns = page.query_selector_all("text=해설 보기")
     btns[0].click()
+    page.wait_for_timeout(1000)
+    btns[1].click()
     page.wait_for_timeout(2000)
 
     # 페이지를 천천히 스크롤
@@ -258,13 +261,11 @@ def test_example(page):
             create_btn = page.query_selector("text=로드맵 생성")
 
             if i >= 14:
-                if submit_btn and submit_btn.is_enabled():
-                    submit_btn.click()
-                elif create_btn and create_btn.is_enabled():
-                    create_btn.click()
-                break
+                page.wait_for_timeout(1000)  # 상태 반영 여유
+
+                page.click("text=제출")
+                page.click("text=제출")
             else:
-                page.wait_for_selector("text=다음 문제로", timeout=3000)
                 page.click("text=다음 문제로")
 
         except Exception as e:
@@ -332,23 +333,20 @@ def test_example(page):
     page.wait_for_url("**/report**", timeout=5000)
     assert "/report" in page.url
 
-    for i in range(2):
-        page.locator("button").nth(6 + i).click()
-        page.wait_for_timeout(1000)
+    buttons = page.query_selector_all("button")
+    print("🔍 페이지 내 버튼 목록:")
+    for i, btn in enumerate(buttons, start=1):
+        try:
+            text = btn.inner_text().strip()
+            print(f"{i:02d}. '{text}'")
+        except Exception as e:
+            print(f"{i:02d}. (텍스트 읽기 실패): {e}")
 
-    # page.locator("button").nth(6).click()
-    # page.wait_for_timeout(1000)
-    # page.locator("button").nth(3).click()
-    # page.wait_for_timeout(1000)
-    #
-    # buttons = page.query_selector_all("button")
-    # print("🔍 페이지 내 버튼 목록:")
-    # for i, btn in enumerate(buttons, start=1):
-    #     try:
-    #         text = btn.inner_text().strip()
-    #         print(f"{i:02d}. '{text}'")
-    #     except Exception as e:
-    #         print(f"{i:02d}. (텍스트 읽기 실패): {e}")
+    page.wait_for_timeout(1500)
+    page.get_by_role("button", name="사후 평가").click(force=True)
+    page.wait_for_timeout(1500)
+    page.click("text=사전/사후평가 비교")
+    page.wait_for_timeout(1500)
 
     # MyPage 버튼 클릭
     page.click("text=MyPage")
@@ -362,4 +360,4 @@ def test_example(page):
     page.click("text=추천 콘텐츠")
     page.wait_for_timeout(2000)
 
-    page.screenshot(path="after_diagnosis.png")
+    page.screenshot(path="test_04_success.png")
