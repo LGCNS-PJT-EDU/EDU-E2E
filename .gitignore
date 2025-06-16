@@ -15,3 +15,5 @@ __pycache__/
 # 테스트 출력물
 *.png
 *.html
+
+videos/
