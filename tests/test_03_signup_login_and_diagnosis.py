@@ -1,5 +1,6 @@
 import random
 
+
 def test_03_signup_login_and_diagnosis(page):
     page.goto("http://localhost:5173")
     assert "TakeIT" in page.title()
@@ -116,7 +117,7 @@ def test_03_signup_login_and_diagnosis(page):
     # 로드맵 로딩이 완료될 때까지 대기
     try:
         page.wait_for_selector("text=오늘도 학습을 시작해볼까요", timeout=5000)
-    except:
+    except Exception:
         # "로드맵이 없습니다" 모달이 떠 있으면 명확히 실패 처리
         if page.is_visible("text=로드맵이 없습니다"):
             raise AssertionError("❌ 로드맵 생성 후에도 로드맵 조회 실패 (로그인 상태 확인 필요)")
@@ -145,4 +146,3 @@ def test_03_signup_login_and_diagnosis(page):
 
     page.wait_for_timeout(3000)
     page.screenshot(path="test_03_success.png")
-

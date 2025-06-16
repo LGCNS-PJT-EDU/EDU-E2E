@@ -1,5 +1,6 @@
 import random
 
+
 def test_05_total_user_flow(page):
     page.goto("http://localhost:5173")
     assert "TakeIT" in page.title()
@@ -111,23 +112,22 @@ def test_05_total_user_flow(page):
     # 결과 페이지 도달 확인
     page.reload()
     page.wait_for_url("**/roadmap", timeout=50000)
-    # assert "/roadmap" in page.url
+    assert "/roadmap" in page.url
     page.reload()
     # 로드맵 로딩이 완료될 때까지 대기
     try:
         page.wait_for_selector("text=오늘도 학습을 시작해볼까요", timeout=5000)
-    except:
+    except Exception:
         # "로드맵이 없습니다" 모달이 떠 있으면 명확히 실패 처리
         if page.is_visible("text=로드맵이 없습니다"):
             raise AssertionError("❌ 로드맵 생성 후에도 로드맵 조회 실패 (로그인 상태 확인 필요)")
         page.screenshot(path="roadmap_render_fail.png")
         raise AssertionError("❌ 로드맵 페이지에서 정상 렌더링이 되지 않았습니다.")
 
-
     try:
         page.wait_for_url("**/roadmap", timeout=5000)
         assert "/roadmap" in page.url
-    except:
+    except Exception:
         page.screenshot(path="login_error.png")
         raise AssertionError("로그인 후 /roadmap으로 이동하지 않음")
 
@@ -193,8 +193,6 @@ def test_05_total_user_flow(page):
 
             # 다음/제출 버튼 등장 대기 및 클릭
             page.wait_for_timeout(500)  # 상태 반영 여유
-            submit_btn = page.query_selector("text=제출")
-            create_btn = page.query_selector("text=로드맵 생성")
 
             if i >= 9:
                 page.wait_for_timeout(1000)  # 상태 반영 여유
@@ -216,9 +214,6 @@ def test_05_total_user_flow(page):
         page.click("text=오답노트 보러 가기")
         print("✅ 오답노트 보러 가기 클릭 완료")
 
-        # 오답노트 페이지 로드 확인
-        # page.wait_for_url("**/solution?subjectId=", timeout=5000)
-        # assert "solution" in page.url
     except Exception as e:
         page.screenshot(path="solution_button_click_fail.png")
         raise AssertionError("❌ 오답노트 보러 가기 클릭 실패") from e
@@ -361,8 +356,6 @@ def test_05_total_user_flow(page):
 
             # 다음/제출 버튼 등장 대기 및 클릭
             page.wait_for_timeout(500)  # 상태 반영 여유
-            submit_btn = page.query_selector("text=제출")
-            create_btn = page.query_selector("text=로드맵 생성")
 
             if i >= 14:
                 page.wait_for_timeout(1000)  # 상태 반영 여유
@@ -382,9 +375,6 @@ def test_05_total_user_flow(page):
         page.click("text=오답노트 보러 가기")
         print("✅ 오답노트 보러 가기 클릭 완료")
 
-        # 오답노트 페이지 로드 확인
-        # page.wait_for_url("**/solution?subjectId=", timeout=5000)
-        # assert "solution" in page.url
     except Exception as e:
         page.screenshot(path="solution_button_click_fail.png")
         raise AssertionError("❌ 오답노트 보러 가기 클릭 실패") from e
@@ -465,5 +455,3 @@ def test_05_total_user_flow(page):
     page.wait_for_timeout(2000)
 
     page.screenshot(path="test_05_success.png")
-
-

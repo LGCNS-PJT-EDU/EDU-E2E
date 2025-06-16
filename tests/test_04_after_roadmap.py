@@ -1,5 +1,6 @@
 import random
 
+
 def test_04_after_roadmap(page):
     page.goto("http://localhost:5173")
     assert "TakeIT" in page.title()
@@ -9,10 +10,10 @@ def test_04_after_roadmap(page):
 
     page.click("text=/login/i")
 
-    #이메일 입력
+    # 이메일 입력
     page.fill("input#email", email)
 
-    #비밀번호 입력
+    # 비밀번호 입력
     page.fill("input#password", password)
 
     # 로그인 버튼 클릭
@@ -21,9 +22,9 @@ def test_04_after_roadmap(page):
     try:
         page.wait_for_url("**/roadmap", timeout=5000)
         assert "/roadmap" in page.url
-    except:
+    except Exception:
         page.screenshot(path="test_04_login_error.png")
-        raise AssertionError("로그인 후 /roadmap으로 이동하지 않음")
+        raise AssertionError("로그인 후 Roadmap으로 이동하지 않음")
 
     page.wait_for_timeout(1000)
 
@@ -257,8 +258,6 @@ def test_04_after_roadmap(page):
 
             # 다음/제출 버튼 등장 대기 및 클릭
             page.wait_for_timeout(500)  # 상태 반영 여유
-            submit_btn = page.query_selector("text=제출")
-            create_btn = page.query_selector("text=로드맵 생성")
 
             if i >= 14:
                 page.wait_for_timeout(1000)  # 상태 반영 여유
@@ -278,9 +277,6 @@ def test_04_after_roadmap(page):
         page.click("text=오답노트 보러 가기")
         print("✅ 오답노트 보러 가기 클릭 완료")
 
-        # 오답노트 페이지 로드 확인
-        # page.wait_for_url("**/solution?subjectId=", timeout=5000)
-        # assert "solution" in page.url
     except Exception as e:
         page.screenshot(path="solution_button_click_fail.png")
         raise AssertionError("❌ 오답노트 보러 가기 클릭 실패") from e

@@ -45,7 +45,7 @@ def test_01_sign_up_and_login_successfully(page):
     try:
         page.wait_for_url("**/roadmap", timeout=5000)
         assert "/roadmap" in page.url
-    except:
+    except Exception:
         page.screenshot(path="login_error.png")
         raise AssertionError("로그인 후 dashboard로 이동하지 않음")
 
